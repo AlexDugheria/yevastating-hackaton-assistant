@@ -1,0 +1,191 @@
+﻿command,context,action
+go to my campaigns,1,0
+show me my all my campaigns,1,0
+show me everything,1,0
+display all campaigns,1,0
+display me my campaign named whatever,1,0
+show me all,1,0
+Create a new campaign,1,1
+Create a new mediaplan,3,1
+Generate a new mediaplan,3,1
+generate a new campaign,1,1
+Build a new campaign,1,1
+build a new mediaplan,3,1
+create a new journey,1,1
+add a new journey,1,1
+build a new journey,1,1
+generate a new journey,1,1
+we work with google,1,0
+show me the mediamix page,2,0
+show me the mediamix,2,0
+show me mediamix,2,0
+display the mediamix,2,0
+display mediamix,2,0
+exhibit mediamix,2,0
+unveil mediamix,2,0
+reveal mediamix,2,0
+go to the mediamix page,2,0
+go to the mediamix,2,0
+see the media mix page,2,0
+see the media mix,2,0
+show me the media mix page,2,0
+show me the media mix,2,0
+display the media mix,2,0
+exhibit the media mix,2,0
+exhibit media mix,2,0
+show me media mix,2,0
+show the channel mix,2,0
+display channel mix,2,0
+channel mix,2,0
+reveal channel mix,2,0
+build a new mediaplan for the next month,3,1
+build a new mediaplan for the next X months,3,1
+create a new mediaplan for the next X months,3,1
+create a new mediaplan for the next month,3,1
+generate a new mediaplan,3,1
+create new mediaplan,3,1
+generate new mediaplan,3,1
+do new mediaplan,3,1
+show me the planning page,3,0
+show me the planning,3,0
+show me planning,3,0
+display the planning,3,0
+display planning,3,0
+exhibit planning,3,0
+unveil planning,3,0
+reveal planning,3,0
+Add X new Mediarows,3,1
+Remove all Adwords Mediarows,3,1
+Show all Adwords mediarows,3,0
+Show me the trafficking page,4,0
+Show me the trafficking,4,0
+Display Trafficking,4,0
+Display trafficking Page,4,0
+Revail Trafficking,4,0
+Revail Trafficking Page,4,0
+Show me the Adserver integration,4,0
+Show Adserver,4,0
+Show Adserver integration,4,0
+display adserver,4,0
+display adserver integration,4,0
+reveal adserver,4,0
+reveal adserver integration,4,0
+Show me the trafficking Adserver integration,4,0
+Show trafficking Adserver,4,0
+Show trafficking Adserver integration,4,0
+display trafficking adserver,4,0
+display trafficking adserver integration,4,0
+reveal trafficking adserver,4,0
+reveal trafficking adserver integration,4,0
+Show me the Google Analytics integration,5,0
+Show Google Analytics,5,0
+Show Google Analytics integration,5,0
+display Google Analytics,5,0
+display Google Analytics integration,5,0
+reveal Google Analytics,5,0
+reveal Google Analytics integration,5,0
+Show me the trafficking Google Analytics integration,5,0
+Show trafficking Google Analytics,5,0
+Show trafficking Google Analytics integration,5,0
+display trafficking Google Analytics,5,0
+display trafficking Google Analytics integration,5,0
+reveal trafficking Google Analytics,5,0
+reveal trafficking Google Analytics integration,5,0
+Show goal status,6,0
+show status,6,0
+show goal progress,6,0
+show campaign progress,6,0
+show goals and progress,6,0
+show goals situation,6,0
+show campaign situation,6,0
+show the channel mix goals,6,0
+show the channel mix progress,6,0
+show the campaign goals,6,0
+show campaigns main kpi,6,0
+show campaigns acquisitions,6,0
+show the channel mix comparison,6,0
+how advertisement fairing?,6,0
+stats,6,0
+show KPI stats,6,0
+compare media plans,6,0
+mediaplan comparison,6,0
+create a new campaign with X budget for the next 6 months,1,0
+allocate budget evenly across all channels,2,1
+add X media row for facebook with X budget,3,1
+what is my campaign performance,6,0
+how is my campaign doing,6,0
+campaign performance,6,0
+campaign results,6,0
+campaign status,6,0
+make a new mediaplan,1,1
+make new journey,1,1
+start new campaign,1,1
+what's the mediamix,2,0
+what's media mix,2,0
+what's the channel mix,2,0
+go to planning,3,0
+what's the planning,3,0
+add X mediarows,3,1
+go to trafficking,4,0
+integration adserver,4,0
+go to adserver trafficking,4,0
+go to google analtycs page,5,0
+google analytics trafficking,5,0
+add new integration google analtyics,5,0
+show kpi status,6,0
+how my campaign is doing,6,0
+what's my campaign performance,6,0
+show my campaign performance,6,0
+show the performance of my campaign,6,0
+what is my campaign performance,6,0
+open the list of my recommendations,7,0
+open my recommendations,7,0
+open my suggestions,7,0
+show my notifications,7,0
+show me my alerts,7,0
+what can you recommend,7,0
+what can you suggest,7,0
+reject all recommendations,7,1
+reject all my suggestions,7,1
+accept the last recommendation,7,1
+accept my latest suggestion,7,1
+apply my recommendations,7,1
+add column to the my campaigns page,1,1
+expand all campaigns,1,1
+expand all journeys,1,1
+show me my campaigns for the June this year,1,0
+copy my campaign XYZ,1,1
+duplicate my campaign named XYZ,1,1
+initialize a new campaign like XYZ,1,1
+generate a new campaign like XYZ,1,1
+show all journeys of the last year,1,0
+copy my journey XYZ,1,1
+duplicate journey XYZ,1,1
+export all my campaigns data,1,1
+show me my funnels strategy for channelmix XYZ,2,0
+display the funnels strategy of journey XYZ,2,0
+show strategic brief of campaign XYZ,2,0
+display the strategy of journey XYZ,2,0
+show my strategy for journey XYZ for this month,2,0
+display my strategy for this month,2,0
+what is my strategic brief for the next month,2,0
+suggest me a channel mix,2,1
+suggest a media mix for campaign XYZ,2,1
+create a new mediaplan for my XYZ journey with X new mediaros,3,1
+start new mediaplan with X mediarows,3,1
+trigger new mediaplan with X mediarows,3,1
+trigger new mediaplan with X mediarow,3,1
+trigger new mediaplan with X media row,3,1
+trigger new mediaplan with X mediarow,3,1
+start new mediaplan with X mediarow,3,1
+start new mediaplan with X mediarows,3,1
+start new mediaplan with X media rows,3,1
+start new mediaplan with X mediarows,3,1
+generate new mediaplan with X mediarow,3,1
+generate new mediaplan with X media row,3,1
+generate new mediaplan with X mediarows,3,1
+generate new mediaplan with X media rows,3,1
+initialize new mediaplan with X mediarow,3,1
+initialize new mediaplan with X media row,3,1
+initialize new mediaplan with X mediarows,3,1
+initialize new mediaplan with X media rows,3,1

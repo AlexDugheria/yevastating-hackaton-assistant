@@ -1,0 +1,60 @@
+generate a new mediaplan with 4 channel search, display, social and native
+generate a new mediaplan with facebook, google ads and dv360
+create a new mediaplan with 4 channel search, display, social and native
+create a new mediaplan with facebook, google ads and dv360
+initiate a new mediaplan with 4 channel search, display, social and native
+initiate a new mediaplan with facebook, google ads and dv360
+generate a new mediaplan with budget 100000 with channels: search, display, social and native
+generate a new mediaplan with budget 6000 with channels: chatbot, display, social and dem
+generate a new mediaplan with budget 72000 with channels: search, chatbot, social and native
+generate a new mediaplan with budget 43920 with channels: native, mobile, social and programmatic radio
+generate a new mediaplan with budget 30000000 with channels: addressable tv, display, social and native
+generate a new mediaplan with budget 2000 with channels: search, display
+generate a new mediaplan with budget 17000 with channels: search, display, social and native
+generate a new mediaplan with budget 250000 for the next month
+generate a new media plan budget 10000 channels: search, display, social and native
+generate a new media plan budget 600000 channels: chatbot, display, social and dem
+generate a new media plan budget 32000 channels: search, chatbot, social and native
+generate a new media plan budget 43920 channels: native, mobile, social and programmatic radio
+generate a new media plan budget 30000000 channels: addressable tv, display, social and native
+generate a new media plan budget 2000 channels: search, display
+generate a new media plan budget 17000 channels: search, display, social and native
+generate a new media plan budget 32000 channels: search, display, social and native
+generate a new media plan budget 250000 for the next month
+add a new mediarow for dv360 with budget 15000
+add 2 new mediarows for dv360 with budget 10000 and facebook with budget 20000
+add a new mediarow for facebook 
+add a new mediarow for google ads
+add a new mediarow for adwords
+create a new mediarow 
+create a new media row
+create a new media row for criteo
+create a new mediarow for italia online
+create a new mediarow with tiktok
+add a new media row for tik tok
+create a new media row with youtube
+create a new media row with bing
+create a new media plan with quantcast, yahoo and amazon
+create a new mediaplan with quantcast, yahoo and amazon
+add search channel to my mediaplan
+create new channel for my mediaplan
+add search channel to my media plan
+Create a new mediaplan
+initialize a new media plan
+create a new mediaplan with the following channels: search, social and native
+create a new mediaplan with dem, addressable tv, programmatic radio 
+create a new mediaplan with chatbot, mobile, native
+create a new mediaplan with dem, video
+create a new media plan with the following channels: search, social and native
+create a new media plan with dem, addressable tv, programmatic radio 
+create a new media plan with chatbot, mobile, native
+create a new media plan with dem, video
+create a new campaign with the following channels: search, social and native
+create a new canpaign with dem, addressable tv, programmatic radio 
+create new campaign plan with chatbot, mobile, native
+create a campaign plan with dem, video
+Generate a new mediaplan
+start new mediaplan with 7 mediarows
+start new mediaplan with 2 media rows
+start new mediaplan with 1 mediarow
+start new mediaplan with a media row
