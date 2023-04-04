@@ -34,11 +34,8 @@ def initialize_logger() -> None:
 
 class Jarvis:
 
-    def __init__(self, client_id:int) -> None:
+    def __init__(self) -> None:
         """Initializer for Jarvis assistant
-
-        Args:
-            client_id (int): id of the client
 
         Returns: None
         """
@@ -50,9 +47,6 @@ class Jarvis:
         with open("utils/jarvis_logo.txt", "r") as f:
             self.logo = f.read()
         self.logger.info(self.logo)
-
-        # 3. Define client_id
-        self.client_id = client_id
 
         # 4. Load models
         self.logger.info('Loading models')
@@ -413,4 +407,4 @@ if __name__ == "__main__":
     initialize_logger()
 
     # 1. Run Assistant
-    Jarvis(client_id=112).main()
+    Jarvis().main()
