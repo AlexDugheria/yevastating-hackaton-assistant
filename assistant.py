@@ -6,6 +6,7 @@ import logging
 import warnings
 from difflib import SequenceMatcher
 from nltk import word_tokenize
+import json
 
 from log.logger import CustomFormatter
 from conf.settings import ACTION_MAPPING, CONTEXT_MAPPING
@@ -220,6 +221,95 @@ class Jarvis:
             'tags': tags
         }
 
+    def budget_assignment(self,
+                          tags:List[Tuple[str,str]],
+                          deep: str,
+                          output:Dict[str,Any]) -> Dict[str,Any]:
+        """Properly assigns budgets in each scenario
+
+        Args:
+            tags: List[Tuple[str,str]]: list of tags
+            deep: str
+            output: Dict[str,Any]: output structure
+
+        returns:
+            Dict[str,Any]: dictionary containing the output structure
+        """
+
+        # Extract granularity level and budget tags
+        level_tag = [tag[0] for tag in tags if tag[1] == deep]
+        budget_tag = [float(tag[0]) for tag in tags if tag[1] == 'BUDGET']
+
+        # CASE 1: perfect match
+        if len(level_tag) == len(budget_tag) and len(level_tag) > 0:
+
+            self.logger.info(f'Found {len(level_tag)} granularities and {len(budget_tag)} budgets, proceeding with matching')
+
+            total_budget = 0
+
+            for i in range(len(level_tag)):
+
+                output['level_deep']['data'].append({
+                    f'{deep.lower()}_name':level_tag[i],
+                    'budget':budget_tag[i]
+                })
+
+                total_budget += budget_tag[i]
+
+            output['budget'] = total_budget
+
+            self.logger.info(f'Total budget allocated: {total_budget}')
+
+
+        # CASE 2: only 1 budget and no granularity
+        elif deep == 'MEDIAPLAN' and len(budget_tag) == 1:
+            self.logger.info('No granularity deeper than mediaplan found. Assigning budget at mediaplan level')
+            output['budget'] = budget_tag[0]
+
+        # CASE 3: no budgets given but we have granularities
+        elif len(budget_tag) == 0 and len(level_tag) > 0:
+            self.logger.info('No budgets declared. proceeding with no budget')
+            for i in range(len(level_tag)):
+
+                output['level_deep']['data'].append({
+                    f'{deep.lower()}_name':level_tag[i],
+                    'budget':0
+                })
+
+        # CASE 4: more budget declared than deeper granularities values
+        elif len(budget_tag) > len(level_tag):
+
+            self.logger.info('Found multiple budgets, more than granularities. Taking last declared')
+            # Define total budget
+            total_budget = 0
+
+            # Cut budget array to match deepest granularity given
+            budget_tag_cut = budget_tag[-(len(level_tag)):]
+
+            for i in range(len(level_tag)):
+
+                output['level_deep']['data'].append({
+                    f'{deep.lower()}_name':level_tag[i],
+                    'budget':budget_tag_cut[i]
+                })
+
+                total_budget += budget_tag_cut[i]
+
+            self.logger.info(f'Total budget allocated {total_budget}')
+            output['budget'] = total_budget
+
+
+        # Any other scenario return the granularities
+        else:
+            for i in range(len(level_tag)):
+
+                output['level_deep']['data'].append({
+                    f'{deep.lower()}_name':level_tag[i],
+                    'budget':0
+                })
+
+        return output
+
     def generate_output(self, model_preds:Dict[str,Any]) -> Dict[str,Any]:
         """Builds output structure
 
@@ -236,9 +326,7 @@ class Jarvis:
             'budget': 0,
             'level_deep':{
                 'name': '',
-                'data':[
-
-                ]
+                'data':[]
                 }
             }
 
@@ -282,15 +370,13 @@ class Jarvis:
             shallow = 'MEDIAPLAN'
 
         # store deepest level
-        output_base_structure['level_main'] = shallow
-        output_base_structure['level_deep']['name'] = deep
+        output_base_structure['level_main'] = shallow.lower()
+        output_base_structure['level_deep']['name'] = deep.lower()
 
         # GENERATE TAXONOMY
-        for tag in tags:
-            if tag[1] == deep:
-                output_base_structure['level_deep']['taxonomy'].append({})
+        output = self.budget_assignment(tags,deep,output_base_structure)
 
-        return None
+        return output
 
     def main(self):
         """Main trigger for Jarvis"""
@@ -309,12 +395,14 @@ class Jarvis:
             model_preds = self.model_predictions(input_data)
 
             # 4. Generate output structure
-            # output_data = self.generate_output(model_preds=model_preds)
+            output_data = self.generate_output(model_preds=model_preds)
 
             self.logger.info("Here's what i can do for you, currently")
-            self.logger.info("")
             for key, value in model_preds.items():
                 self.logger.info(f'{key} : {value}')
+            self.logger.info("")
+            self.logger.info("Here's your output")
+            self.logger.info(json.dumps(output_data,indent=4))
             self.logger.info("")
             self.logger.info("---------------------------------------------")
 
