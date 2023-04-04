@@ -20,16 +20,6 @@ def warn(*args, **kwargs):
 
 warnings.warn = warn
 
-def initialize_logger() -> None:
-    """Initialize logger for the process"""
-
-    # Define logger parameters
-    handler = logging.StreamHandler()
-
-    # Define configuration
-    handler.setFormatter(CustomFormatter())
-    logging.basicConfig(level=logging.INFO, handlers=[handler])
-
 
 
 class Jarvis:
@@ -403,8 +393,12 @@ class Jarvis:
 
 if __name__ == "__main__":
 
-    # 1. Initilize logger
-    initialize_logger()
+    # Define logger parameters
+    handler = logging.StreamHandler()
+
+    # Define configuration
+    handler.setFormatter(CustomFormatter())
+    logging.basicConfig(level=logging.INFO, handlers=[handler])
 
     # 1. Run Assistant
     Jarvis().main()
