@@ -1,13 +1,16 @@
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 import spacy
 import joblib
 import logging
 import warnings
+from difflib import SequenceMatcher
+from nltk import word_tokenize
 
 from log.logger import CustomFormatter
-from common.athena_client import AthenaClient
-from conf.settings import ATHENA
+from conf.settings import ACTION_MAPPING, CONTEXT_MAPPING
+from conf.settings import interact_actions, show_actions, trigger_actions
+from utils.utils import find_deepest_granularity_hierarchy, find_shallow_granularity_hierarchy
 
 
 # filter sklearn warnings
@@ -16,19 +19,19 @@ def warn(*args, **kwargs):
 
 warnings.warn = warn
 
+def initialize_logger() -> None:
+    """Initialize logger for the process"""
+
+    # Define logger parameters
+    handler = logging.StreamHandler()
+
+    # Define configuration
+    handler.setFormatter(CustomFormatter())
+    logging.basicConfig(level=logging.INFO, handlers=[handler])
+
+
+
 class Jarvis:
-
-    @staticmethod
-    def initialize_logger() -> None:
-        """Initialize logger for the process"""
-
-        # Define logger parameters
-        handler = logging.StreamHandler()
-
-        # Define configuration
-        handler.setFormatter(CustomFormatter())
-        logging.basicConfig(level=logging.INFO, handlers=[handler])
-
 
     def __init__(self, client_id:int) -> None:
         """Initializer for Jarvis assistant
@@ -39,10 +42,7 @@ class Jarvis:
         Returns: None
         """
 
-
-
-        # 1. Initilize logger
-        self.initialize_logger()
+        # 1. Initialie Logger
         self.logger = logging.getLogger('JARVIS')
 
         # 2. Import and print logo
@@ -53,49 +53,17 @@ class Jarvis:
         # 3. Define client_id
         self.client_id = client_id
 
-        # 4. Load athena client
-        self.athena_client = AthenaClient(ATHENA)
-
-        # 5. Load mediaplan
-        self.mediaplans = self.get_basic_data()
-
-        # 6. Load models
+        # 4. Load models
         self.logger.info('Loading models')
         self.context_model = joblib.load('models/sgd_context.joblib')
         self.action_model = joblib.load('models/sgd_action.joblib')
         self.ner_model = spacy.load('models/NER/output/model-best')
 
-        # 7. Define context mappings
-        self.context_mapping = {
-            0:'mycampaign-main_page',
-            1:'mycampaign-mediamix',
-            2:'mycampaign-planning',
-            3:'mycampaign-trafficking-adserver',
-            4:'mycampaign-trafficking-analytics',
-            5:'mycampaign-goals-and-progres ',
-            6:'notifications-recommendations'
-        }
+        # 5. Define context mappings
+        self.context_mapping = CONTEXT_MAPPING
 
-        # 8. Define action mappings
-        self.action_mapping = {
-            0:'show',
-            1:'interact'
-        }
-
-    def get_basic_data(self) -> pd.DataFrame:
-        """Extracts basic client information and stores it.
-
-        Returns: pd.DataFrame
-        """
-
-        self.logger.info("SETUP: Extracting client information from DB")
-
-        basic_data = self.athena_client.run_query('sql/default_data.sql',
-                                         params={
-                                             'client_id': self.client_id
-                                                }
-                                         )
-        return basic_data
+        # 6. Define action mappings
+        self.action_mapping = ACTION_MAPPING
 
     def data_preprocesser(self, prompt:str) -> pd.Series:
         """Preprocess data to ML model expected format
@@ -115,6 +83,115 @@ class Jarvis:
 
         return X
 
+    def find_proper_granularity(self, tags:List[Tuple[str,str]]) -> List[Tuple[str,str]]:
+        """Identifies platform granularity by word matching
+
+        Args:
+            tags: List[Tuple[str,str]]: list containing tags
+
+        Returns:
+            List[Tuple[str,str]]
+        """
+
+        # Loop on each tag
+        for i in range(len(tags)):
+
+            # Loop on each granularity level
+            for gran in ['mediaplan','channel','platform','mediarow']:
+
+                # Clean error for granularity in case of match
+                if SequenceMatcher(None, str(tags[i][0]), gran).ratio() > 0.85:
+                    if tags[i][1] != 'GRANULARITY':
+                        self.logger.warning(f'Found unproper tag, fixing it to proper granularity: {tags[i]}')
+                        tags[i] = (str(tags[i][0]),'GRANULARITY')
+
+        return tags
+
+    def remove_wrong_tags(self, tags:List[Tuple[str,str]]) -> List[Tuple[str,str]]:
+        """Remove incorrect tags from output
+
+        Args:
+            tags (List[Tuple[str,str]]): list of tags
+
+        Returns:
+            List[Tuple[str,str]]
+        """
+
+        downcount = 0
+
+        # Find all budget values which are not budgets
+        for i in range(len(tags)):
+            i = i-downcount
+            try:
+                # Check if value can be converted to float
+                val = float(tags[i][0])
+
+                if type(val) == float and tags[i][1] != 'BUDGET':
+                    # If value is a float but it's not a budget, delete it
+                    self.logger.warning(f'FOUND WORNG TAG: REMOVING {tags[i]}')
+                    del tags[i]
+                    downcount += 1
+
+            except ValueError:
+                continue
+
+        return tags
+
+    def find_budget_tags(self, prompt:str, tags:List[Tuple[str,str]]) -> List[Tuple[str,str]]:
+        """Identifies budget tag and adds them to tag
+
+        Args:
+            prompt (str): string
+            tags (List[Tuple[str,str]]): list of keywords and tags
+
+        Returns:
+            List[Tuple[str,str]]: list of tags with budget tags
+
+        """
+
+        # Define tokens with tokenizer
+        tokens = [tok for tok in word_tokenize(prompt) if tok != ',']
+
+        # Find budget keyword
+        for i in range(len(tokens)):
+            if tokens[i] == 'budget' or SequenceMatcher(None, tokens[i], 'budget').ratio() > 0.9:
+
+                # Get all budget values into tags as BUDGET tag
+                for j in range(i+1, len(tokens)):
+                    try:
+                        val = float(tokens[j])
+                        tags.append((val,'BUDGET'))
+
+                    except ValueError:
+                        break
+        return tags
+
+    def process_tags(self,prompt:str, tags: List[Tuple[str,str]]):
+        """Preprocess all the tags
+
+        Args:
+            prompt (str): command prompt
+            tags (List[Tuple[str,str]]): tags identified by NER model
+
+        Returns:
+            List[Tuple[str,str]]: tags processed
+
+        """
+
+        # 1. Remove filter tags (model to be retrained)
+        tags = [tag for tag in tags if tag[1] != 'FILTER']
+
+        # 2. Identify budget tags
+        tags = self.find_budget_tags(prompt,tags)
+
+        # 3. Clean error in granularity identification
+        tags = self.find_proper_granularity(tags)
+
+        # 4. Remove wrong tags
+        tags = self.remove_wrong_tags(tags)
+
+        return tags
+
     def model_predictions(self, prompt: pd.Series) -> Dict[str,Any]:
         """Generate models predictions
 
@@ -132,7 +209,10 @@ class Jarvis:
         action = self.action_model.predict(prompt)
 
         # 3. Parse Input to find tags
-        tags = [(word.text,word.label_) for word in self.ner_model(prompt[0]).ents]
+        tags = self.process_tags(
+            prompt=prompt[0],
+            tags=[(word.text,word.label_) for word in self.ner_model(prompt[0]).ents]
+            )
 
         return {
             'context': self.context_mapping[context[0]],
@@ -141,7 +221,7 @@ class Jarvis:
         }
 
     def generate_output(self, model_preds:Dict[str,Any]) -> Dict[str,Any]:
-        """_summary_
+        """Builds output structure
 
         Args:
             model_preds (Dict[str,Any]): _description_
@@ -149,7 +229,68 @@ class Jarvis:
         Returns:
             Dict[str,Any]: _description_
         """
-        pass
+
+        output_base_structure = {
+            'main_action':'',
+            'level_main':'',
+            'budget': 0,
+            'level_deep':{
+                'name': '',
+                'data':[
+
+                ]
+                }
+            }
+
+        # Get tags
+        tags = model_preds['tags']
+
+        # Search for main action
+        for tag in tags:
+            if tag[1] == 'ACTION':
+
+                # Extract Action token
+                action = tag[0]
+
+                # Identify proper action class
+                if action in interact_actions['create']:
+                    output_base_structure['main_action'] = 'create'
+                elif action in interact_actions['modify']:
+                    output_base_structure['main_action'] = 'modify'
+                elif action in interact_actions['decision']:
+                    output_base_structure['main_action'] = 'decision'
+                elif action in show_actions:
+                    output_base_structure['main_action'] = 'show'
+                elif action in trigger_actions:
+                    output_base_structure['main_action'] = 'trigger'
+                else:
+                    output_base_structure['main_action'] = 'unclear'
+
+        # Search for granularity
+        granularities = []
+
+        # EXTRACT ALL GRANULARITIES
+        for tag in tags:
+            if tag[1] == 'GRANULARITY':
+                granularities.append(tag[0])
+
+        # FIND DEEPEST LEVEL
+        deep = find_deepest_granularity_hierarchy(granularities)
+        shallow = find_shallow_granularity_hierarchy(granularities)
+
+        if not deep == shallow == 'MEDIAROW':
+            shallow = 'MEDIAPLAN'
+
+        # store deepest level
+        output_base_structure['level_main'] = shallow
+        output_base_structure['level_deep']['name'] = deep
+
+        # GENERATE TAXONOMY
+        for tag in tags:
+            if tag[1] == deep:
+                output_base_structure['level_deep']['taxonomy'].append({})
+
+        return None
 
     def main(self):
         """Main trigger for Jarvis"""
@@ -168,7 +309,7 @@ class Jarvis:
             model_preds = self.model_predictions(input_data)
 
             # 4. Generate output structure
-            output_data = self.generate_output(model_preds=model_preds)
+            # output_data = self.generate_output(model_preds=model_preds)
 
             self.logger.info("Here's what i can do for you, currently")
             self.logger.info("")
@@ -179,6 +320,9 @@ class Jarvis:
 
 
 if __name__ == "__main__":
+
+    # 1. Initilize logger
+    initialize_logger()
 
     # 1. Run Assistant
     Jarvis(client_id=112).main()
